@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class SpringApiApplication
 
 fun main(args: Array<String>) {
-	val context = runApplication<SpringApiApplication>(*args)
+	runApplication<SpringApiApplication>(*args)
 }
