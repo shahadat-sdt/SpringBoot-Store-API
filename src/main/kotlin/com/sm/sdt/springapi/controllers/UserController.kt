@@ -1,38 +1,36 @@
 package com.sm.sdt.springapi.controllers
 
-import com.sm.sdt.springapi.dtos.UserDtos
+import com.sm.sdt.springapi.dtos.UserDto
+import com.sm.sdt.springapi.mapper.UserMapper
 import com.sm.sdt.springapi.repository.UserRepository
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.servlet.function.EntityResponse
-import javax.xml.stream.events.EntityDeclaration
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/users")
 
-class UserController(private val userRepository: UserRepository) {
+class UserController(
+    private val userRepository: UserRepository,
+    private val userMapper: UserMapper
+) {
 
     @GetMapping
-    fun getAllUsers(): Iterable<UserDtos> {
-        return userRepository.findAll()
+    fun getAllUsers(
+        @RequestParam(required = false, name = "sort") sort: String = "name"
+    ): Iterable<UserDto> {
+        return userRepository.findAll(Sort.by(sort))
             .stream()
-            .map { UserDtos(id = it.id, name = it.name, email = it.email) }
+            .map { userMapper.toDto(it) }
             .toList()
     }
 
     @GetMapping("/{id}")
-    fun getUser(@PathVariable id: Long): ResponseEntity<UserDtos> {
-        val user = userRepository.findByIdOrNull(id)
+    fun getUser(@PathVariable id: Long): ResponseEntity<UserDto> {
+        val user = userRepository.findByIdOrNull(id) ?: return ResponseEntity.notFound().build()
 
-        if (user == null) {
-            return ResponseEntity.notFound().build()
-        }
-        val userDtos = UserDtos(id = user.id, name = user.name, email = user.email)
-        return ResponseEntity.ok(userDtos)
+        return ResponseEntity.ok(userMapper.toDto(user))
 
 
     }
