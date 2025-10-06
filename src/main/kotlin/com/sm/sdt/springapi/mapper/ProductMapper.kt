@@ -4,10 +4,20 @@ import com.sm.sdt.springapi.dtos.ProductDto
 import com.sm.sdt.springapi.entities.Product
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
-import org.mapstruct.Mappings
+import org.mapstruct.MappingTarget
+import org.springframework.transaction.annotation.Transactional
 
 @Mapper(componentModel = "Spring")
 interface ProductMapper {
-    @Mapping(source = "category.id",target = "categoryId")
-    fun toDto(user: Product): ProductDto
+    @Mapping(source = "category.id", target = "categoryId")
+    fun toDto(product: Product): ProductDto
+
+    fun toEntity(productDto: ProductDto): Product
+
+
+    @Mapping( target = "id", ignore = true)
+    fun update(
+        productDto: ProductDto,
+        @MappingTarget
+        product: Product)
 }
