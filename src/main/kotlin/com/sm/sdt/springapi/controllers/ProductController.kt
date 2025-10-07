@@ -4,7 +4,6 @@ import com.sm.sdt.springapi.dtos.ProductDto
 import com.sm.sdt.springapi.mapper.ProductMapper
 import com.sm.sdt.springapi.repository.CategoryRepository
 import com.sm.sdt.springapi.repository.ProductRepository
-import com.sm.sdt.springapi.repository.ProfileRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -16,11 +15,10 @@ class ProductController(
     private val productRepository: ProductRepository,
     private val productMapper: ProductMapper,
     private val categoryRepository: CategoryRepository,
-    private val profileRepository: ProfileRepository
 ) {
 
     @GetMapping
-    fun getAllProducts(
+    fun getAllProductsByCategory(
         @RequestParam(name = "categoryId", required = false)
         categoryId: Long?
     ): List<ProductDto> {
