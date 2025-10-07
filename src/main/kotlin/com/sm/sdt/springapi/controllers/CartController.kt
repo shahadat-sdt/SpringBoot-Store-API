@@ -3,14 +3,17 @@ package com.sm.sdt.springapi.controllers
 import com.sm.sdt.springapi.dtos.AddItemsToCartRequest
 import com.sm.sdt.springapi.dtos.CartDto
 import com.sm.sdt.springapi.dtos.CartItemDto
+import com.sm.sdt.springapi.dtos.UpdateCartItemRequest
 import com.sm.sdt.springapi.entities.Cart
 import com.sm.sdt.springapi.entities.CartItem
 import com.sm.sdt.springapi.mapper.CartMapper
 import com.sm.sdt.springapi.repository.CartItemRepository
 import com.sm.sdt.springapi.repository.CartRepository
 import com.sm.sdt.springapi.repository.ProductRepository
+import jakarta.validation.Valid
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
@@ -67,5 +70,22 @@ class CartController(
         val cart = cartRepository.getCartWithItems(cartId).orElse(null)
             ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok().body(cartMapper.toDto(cart))
+    }
+
+    @PutMapping("/{cartId}/items/{productId}")
+    fun updateCartItem(
+        @PathVariable productId: Long,
+        @PathVariable cartId: UUID,
+         @RequestBody @Valid request: UpdateCartItemRequest
+    ): ResponseEntity<*> {
+        val cart = cartRepository.getCartWithItems(cartId).orElse(null) ?: return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+            mapOf("error" to "Cart Not found")
+        )
+        val cartItem = cart.items.find { it.product!!.id == productId } ?: return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+            mapOf("error" to "Product Not found")
+        )
+        cartItem.quantity = request.quantity
+        cartRepository.save(cart)
+        return ResponseEntity.ok().body(cartMapper.toCartItemDto(cartItem))
     }
 }
