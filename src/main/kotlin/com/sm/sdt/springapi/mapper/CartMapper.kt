@@ -13,6 +13,8 @@ interface CartMapper {
 
     fun toEntity(cartDto: CartDto): Cart
 
+
+    @Mapping(expression ="java(cart.calculateTotalPrice())" , target = "totalPrice")
     fun toDto(cart: Cart): CartDto
 
 

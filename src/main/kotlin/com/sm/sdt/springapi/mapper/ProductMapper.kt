@@ -5,7 +5,6 @@ import com.sm.sdt.springapi.entities.Product
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
-import org.springframework.transaction.annotation.Transactional
 
 @Mapper(componentModel = "Spring")
 interface ProductMapper {
@@ -15,9 +14,10 @@ interface ProductMapper {
     fun toEntity(productDto: ProductDto): Product
 
 
-    @Mapping( target = "id", ignore = true)
+    @Mapping(target = "id", ignore = true)
     fun update(
         productDto: ProductDto,
         @MappingTarget
-        product: Product)
+        product: Product
+    )
 }

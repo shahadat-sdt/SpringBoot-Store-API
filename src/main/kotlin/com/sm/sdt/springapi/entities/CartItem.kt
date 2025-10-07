@@ -15,7 +15,7 @@ class CartItem(
     @JoinColumn(name = "cart_id")
     var cart: Cart? = null,
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "product_id")
     var product: Product? = null,
 
@@ -26,6 +26,7 @@ class CartItem(
     fun getTotalPrice(): BigDecimal {
         return product!!.price.multiply(quantity!!.toBigDecimal())
     }
+
 
     override fun toString(): String {
         return "CartItem(id=$id, quantity=$quantity)"

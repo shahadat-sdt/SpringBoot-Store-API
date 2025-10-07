@@ -1,6 +1,7 @@
 package com.sm.sdt.springapi.entities
 
 import jakarta.persistence.*
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.*
 
@@ -16,8 +17,10 @@ class Cart(
     @Column(name = "date_created", insertable = false, updatable = false)
     var dateCreated: LocalDate? = null,
 
-    @OneToMany(mappedBy = "cart", cascade = [(CascadeType.MERGE)])
-    var items: MutableSet<CartItem> = mutableSetOf()
+    @OneToMany(mappedBy = "cart", cascade = [(CascadeType.MERGE)], fetch = FetchType.EAGER)
+    var items: MutableList<CartItem> = arrayListOf()
 ) {
+
+    fun calculateTotalPrice(): BigDecimal = items.sumOf { it.getTotalPrice() }
 
 }

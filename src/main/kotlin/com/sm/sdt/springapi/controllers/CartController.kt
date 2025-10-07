@@ -10,6 +10,7 @@ import com.sm.sdt.springapi.repository.CartItemRepository
 import com.sm.sdt.springapi.repository.CartRepository
 import com.sm.sdt.springapi.repository.ProductRepository
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
@@ -25,7 +26,7 @@ class CartController(
 ) {
 
     @PostMapping
-    fun createCart(
+    fun addToCart(
         uriComponentsBuilder: UriComponentsBuilder
     ): ResponseEntity<CartDto> {
         val cart = Cart()
@@ -41,25 +42,30 @@ class CartController(
 
 
     @PostMapping("/{cartId}/items")
-    fun createCart(
+    fun addToCart(
         @PathVariable cartId: UUID,
         @RequestBody request: AddItemsToCartRequest,
-        uriComponentsBuilder: UriComponentsBuilder
     ): ResponseEntity<CartItemDto> {
-        val cart = cartRepository.findByIdOrNull(cartId) ?: return ResponseEntity.notFound().build()
+        val cart = cartRepository.getCartWithItems(cartId).orElse(null) ?: return ResponseEntity.notFound().build()
         val product = productRepository.findByIdOrNull(request.productId) ?: return ResponseEntity.badRequest().build()
+        var cartItem = cart.items.find { it.product!!.id == product.id }
 
-        cart.items.forEach { item ->
-            if (item.product!!.id == request.productId) {
-                item.quantity = item.quantity!! + 1
-                cartRepository.save(cart)
-                return ResponseEntity.ok().body(cartMapper.toCartItemDto(item))
-            }
+        if (cartItem != null) {
+            cartItem.quantity = cartItem.quantity!! + 1
+        } else {
+            cartItem = CartItem(cart = cart, product = product, quantity = 1)
+            cart.items.add(cartItem)
         }
-        val newItem = CartItem(cart = cart, product = product, quantity = 1)
-        cart.items.add(newItem)
         cartRepository.save(cart)
-        val uri = uriComponentsBuilder.path("carts/{id}").buildAndExpand(cart.id).toUri()
-        return ResponseEntity.created(uri).body(cartMapper.toCartItemDto(newItem))
+        return ResponseEntity.status(HttpStatus.CREATED).body(cartMapper.toCartItemDto(cartItem))
+    }
+
+    @GetMapping("/{cartId}")
+    fun getCartItems(
+        @PathVariable cartId: UUID
+    ): ResponseEntity<CartDto> {
+        val cart = cartRepository.getCartWithItems(cartId).orElse(null)
+            ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok().body(cartMapper.toDto(cart))
     }
 }
