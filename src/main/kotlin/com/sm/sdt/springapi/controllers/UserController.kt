@@ -4,9 +4,11 @@ import com.sm.sdt.springapi.dtos.RegisterUserRequest
 import com.sm.sdt.springapi.dtos.UserDto
 import com.sm.sdt.springapi.mapper.UserMapper
 import com.sm.sdt.springapi.repository.UserRepository
+import jakarta.validation.Valid
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ResponseEntity
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 
@@ -15,7 +17,8 @@ import org.springframework.web.util.UriComponentsBuilder
 
 class UserController(
     private val userRepository: UserRepository,
-    private val userMapper: UserMapper
+    private val userMapper: UserMapper,
+    private val passwordEncoder: PasswordEncoder
 ) {
 
     @GetMapping
@@ -38,13 +41,15 @@ class UserController(
 
     @PostMapping
     fun registerUser(
-        @RequestBody request: RegisterUserRequest,
+        @RequestBody @Valid request: RegisterUserRequest,
         uriComponentsBuilder: UriComponentsBuilder
     ): ResponseEntity<UserDto> {
 
         val user = userMapper.toEntity(request)
+        user.password = passwordEncoder.encode(user.password)
         userRepository.save(user)
         val uri = uriComponentsBuilder.path("/users/{id}").buildAndExpand(user.id).toUri()
         return ResponseEntity.created(uri).body(userMapper.toDto(user))
     }
+
 }
