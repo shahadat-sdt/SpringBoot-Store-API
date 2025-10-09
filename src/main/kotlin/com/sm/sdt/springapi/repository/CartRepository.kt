@@ -1,12 +1,12 @@
 package com.sm.sdt.springapi.repository
 
 import com.sm.sdt.springapi.entities.Cart
-import com.sm.sdt.springapi.entities.CartItem
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import java.util.*
+
 
 interface CartRepository : JpaRepository<Cart, UUID> {
 

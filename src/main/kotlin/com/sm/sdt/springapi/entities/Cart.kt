@@ -3,7 +3,7 @@ package com.sm.sdt.springapi.entities
 import jakarta.persistence.*
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 @Entity
 @Table(name = "carts")
