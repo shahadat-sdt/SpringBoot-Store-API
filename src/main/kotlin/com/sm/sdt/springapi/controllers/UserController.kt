@@ -8,6 +8,8 @@ import jakarta.validation.Valid
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
@@ -18,8 +20,9 @@ import org.springframework.web.util.UriComponentsBuilder
 class UserController(
     private val userRepository: UserRepository,
     private val userMapper: UserMapper,
-    private val passwordEncoder: PasswordEncoder
-) {
+    private val passwordEncoder: PasswordEncoder,
+
+    ) {
 
     @GetMapping
     fun getAllUsers(
@@ -51,5 +54,6 @@ class UserController(
         val uri = uriComponentsBuilder.path("/users/{id}").buildAndExpand(user.id).toUri()
         return ResponseEntity.created(uri).body(userMapper.toDto(user))
     }
+
 
 }

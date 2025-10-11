@@ -1,5 +1,6 @@
 package com.sm.sdt.springapi.config
 
+import com.sm.sdt.springapi.filters.JwtAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -14,18 +15,21 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig() {
+class SecurityConfig {
     @Bean
     fun passwordEncoder(): PasswordEncoder {
         return BCryptPasswordEncoder()
     }
 
     @Bean
-    fun authenticationProvider(userDetailsService: UserDetailsService): AuthenticationProvider {
+    fun authenticationProvider(
+        userDetailsService: UserDetailsService
+    ): AuthenticationProvider {
         val provider = DaoAuthenticationProvider()
         provider.setUserDetailsService(userDetailsService)
         provider.setPasswordEncoder(passwordEncoder())
@@ -38,22 +42,18 @@ class SecurityConfig() {
     }
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http
-            .sessionManagement { c ->
-                c.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            }
-            .csrf { c ->
-                c.disable()
-            }
-            .authorizeHttpRequests { c ->
-                c
-                    .requestMatchers("/carts/**").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                    .anyRequest().authenticated()
+    fun securityFilterChain(http: HttpSecurity, jwtAuthenticationFilter: JwtAuthenticationFilter): SecurityFilterChain {
+        http.sessionManagement { c ->
+            c.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        }.csrf { c ->
+            c.disable()
+        }.authorizeHttpRequests { c ->
+            c.requestMatchers("/carts/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                .anyRequest().authenticated()
 
-            }
+        }.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }
