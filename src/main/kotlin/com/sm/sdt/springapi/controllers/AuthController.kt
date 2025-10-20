@@ -36,7 +36,7 @@ class AuthController(
         response: HttpServletResponse
     ): ResponseEntity<JwtResponse> {
         authenticationManager.authenticate(UsernamePasswordAuthenticationToken(request.email, request.password))
-        val user = userRepository.findByEmail(request.email)?: throw UsernameNotFoundException("User not found")
+        val user = userRepository.findByEmail(request.email) ?: throw UsernameNotFoundException("User not found")
         val accessToken = jwtService.generateToken(user)
         val refreshToken = jwtService.generateRefreshToken(user)
 
@@ -44,20 +44,27 @@ class AuthController(
         cookie.isHttpOnly = true
         cookie.path = "/auth/refresh"
         cookie.maxAge = jwtConfig.refreshToken
-       // cookie.secure = true
+        cookie.secure = true
 
         response.addCookie(cookie)
         return ResponseEntity.ok(JwtResponse(accessToken))
     }
 
-    @PostMapping("/validate")
-    fun validateToken(@RequestHeader("Authorization") authHeader: String): Boolean {
-        val token = authHeader.replace("Bearer ", "")
-        return jwtService.validateToken(token)
+    @PostMapping("/refresh")
+    fun refresh(
+        @CookieValue(value = "refreshToken") refreshToken: String
+    ): ResponseEntity<JwtResponse> {
+        if (!jwtService.validateToken(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+        }
+        val userId = jwtService.getUserIdFromToken(refreshToken)
+        val user = userRepository.findByIdOrNull(userId) ?: throw UsernameNotFoundException("User not found")
+        val accessToken = jwtService.generateToken(user)
+
+        return ResponseEntity.ok(JwtResponse(accessToken))
     }
 
-
-     @GetMapping("/me")
+    @GetMapping("/me")
     fun me(): UserDto {
 
         val authentication = SecurityContextHolder.getContext().authentication
@@ -65,7 +72,6 @@ class AuthController(
         val user = userRepository.findByIdOrNull(userId) ?: throw BadCredentialsException("User not found")
         return userMapper.toDto(user)
     }
-
 
 
     @ExceptionHandler(BadCredentialsException::class)
