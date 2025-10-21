@@ -2,6 +2,7 @@ package com.sm.sdt.springapi.controllers
 
 import com.sm.sdt.springapi.dtos.RegisterUserRequest
 import com.sm.sdt.springapi.dtos.UserDto
+import com.sm.sdt.springapi.entities.Role
 import com.sm.sdt.springapi.mapper.UserMapper
 import com.sm.sdt.springapi.repository.UserRepository
 import jakarta.validation.Valid
@@ -50,6 +51,7 @@ class UserController(
 
         val user = userMapper.toEntity(request)
         user.password = passwordEncoder.encode(user.password)
+        user.role = Role.CUSTOMER
         userRepository.save(user)
         val uri = uriComponentsBuilder.path("/users/{id}").buildAndExpand(user.id).toUri()
         return ResponseEntity.created(uri).body(userMapper.toDto(user))

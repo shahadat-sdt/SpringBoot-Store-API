@@ -40,28 +40,30 @@ class AuthController(
         val accessToken = jwtService.generateToken(user)
         val refreshToken = jwtService.generateRefreshToken(user)
 
-        val cookie = Cookie("refreshToken", refreshToken)
+        val cookie = Cookie("refreshToken", refreshToken.toString())
         cookie.isHttpOnly = true
         cookie.path = "/auth/refresh"
         cookie.maxAge = jwtConfig.refreshToken
         cookie.secure = true
 
         response.addCookie(cookie)
-        return ResponseEntity.ok(JwtResponse(accessToken))
+        return ResponseEntity.ok(JwtResponse(accessToken.toString()))
     }
 
     @PostMapping("/refresh")
     fun refresh(
         @CookieValue(value = "refreshToken") refreshToken: String
     ): ResponseEntity<JwtResponse> {
-        if (!jwtService.validateToken(refreshToken)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+        val jwt = jwtService.parseToken(refreshToken)
+
+            if (jwt == null || jwt.isExpired()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+
         }
-        val userId = jwtService.getUserIdFromToken(refreshToken)
-        val user = userRepository.findByIdOrNull(userId) ?: throw UsernameNotFoundException("User not found")
+        val user = userRepository.findByIdOrNull(jwt.getUserId()) ?: throw UsernameNotFoundException("User not found")
         val accessToken = jwtService.generateToken(user)
 
-        return ResponseEntity.ok(JwtResponse(accessToken))
+        return ResponseEntity.ok(JwtResponse(accessToken.toString()))
     }
 
     @GetMapping("/me")

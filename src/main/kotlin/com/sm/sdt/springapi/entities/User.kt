@@ -22,6 +22,10 @@ class User(
     @OneToMany(mappedBy = "user",  cascade = [(CascadeType.PERSIST),(CascadeType.REMOVE)], orphanRemoval = true)
     var addresses: MutableList<Address> = mutableListOf(),
 
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    var role : Role,
+
     @OneToOne(mappedBy = "user",cascade = [(CascadeType.REMOVE)])
     var profile: Profile? = null,
 

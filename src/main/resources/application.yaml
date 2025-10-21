@@ -11,5 +11,5 @@ spring:
     clean-disabled: false
   jwt:
     secret-key: ${JWT_SECRET}
-    access-token: 300 # 5m
+    access-token: 900 # 5m
     refresh-token: 604800 # 7d
