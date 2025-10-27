@@ -75,13 +75,5 @@ class CartController(
 
     }
 
-    @ExceptionHandler(CartNotFoundException::class)
-    fun handleCartNotFound(): ResponseEntity<Map<String, String>> {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "Cart not found"))
-    }
 
-    @ExceptionHandler(ProductNotFoundException::class)
-    fun handleProductNotFound(): ResponseEntity<Map<String, String>> {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to "Product not found in the Cart"))
-    }
 }

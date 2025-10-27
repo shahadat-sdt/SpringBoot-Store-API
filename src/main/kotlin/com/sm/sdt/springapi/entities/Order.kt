@@ -6,25 +6,49 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "orders")
-class Order {
+class Order(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    var id: Long? = null
+    var id: Long? = null,
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    var customer: User? = null
+    var customer: User? = null,
 
     @Column(name = "status")
-    var status: Status? = null
+    @Enumerated(EnumType.STRING)
+    var status: Status? = null,
 
     @Column(name = "created_at", insertable = false, updatable = false)
-    var createdAt: LocalDateTime? = null
+    var createdAt: LocalDateTime? = null,
 
     @Column(name = "total_price")
-    var totalPrice: BigDecimal? = null
+    var totalPrice: BigDecimal? = null,
 
-    @OneToMany(mappedBy = "order",cascade = [(CascadeType.PERSIST)])
+    @OneToMany(mappedBy = "order", cascade = [(CascadeType.PERSIST)])
     var items: MutableSet<OrderItem> = mutableSetOf()
+) {
+
+    fun fromCart(cart: Cart, customer: User): Order {
+        val order = Order()
+        order.customer = customer
+        order.status = Status.PENDING
+        order.totalPrice = cart.calculateTotalPrice()
+        cart.items.forEach { item ->
+            val orderItem = OrderItem(
+                order = order,
+                product = item.product,
+                quantity = item.quantity
+            ).apply {
+                totalPrice = item.getTotalPrice()
+                unitPrice = item.product?.price
+            }
+            order.items.add(orderItem)
+        }
+
+        return order
+    }
+
+    fun isPlacedBy(user: User) = customer?.id == user.id
 }

@@ -46,4 +46,6 @@ class Cart(
 
     fun clearCartItems() = items.clear()
 
+    fun isEmpty() = items.isEmpty()
+
 }
