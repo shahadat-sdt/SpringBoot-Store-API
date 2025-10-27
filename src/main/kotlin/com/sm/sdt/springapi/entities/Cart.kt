@@ -3,6 +3,7 @@ package com.sm.sdt.springapi.entities
 import jakarta.persistence.*
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Entity
@@ -14,7 +15,7 @@ class Cart(
     var id: UUID? = null,
 
     @Column(name = "date_created", insertable = false, updatable = false)
-    var dateCreated: LocalDate? = null,
+    var dateCreated: LocalDateTime? = null,
 
     @OneToMany(mappedBy = "cart", cascade = [(CascadeType.MERGE)], fetch = FetchType.EAGER,orphanRemoval = true)
     var items: MutableList<CartItem> = arrayListOf()

@@ -1,9 +1,6 @@
 package com.sm.sdt.springapi.entities
 
 import jakarta.persistence.*
-import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Size
-import org.hibernate.annotations.ColumnDefault
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -28,6 +25,6 @@ class Order {
     @Column(name = "total_price")
     var totalPrice: BigDecimal? = null
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order",cascade = [(CascadeType.PERSIST)])
     var items: MutableSet<OrderItem> = mutableSetOf()
 }
