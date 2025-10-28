@@ -44,4 +44,9 @@ class GlobalExceptionHandler {
     fun handleAccessDenied(ex: Exception): ResponseEntity<ErrorDto> {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.message?.let { ErrorDto(it) })
     }
+
+    @ExceptionHandler(PaymentException::class)
+    fun handlePaymentException(ex: PaymentException): ResponseEntity<ErrorDto> {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.message?.let { ErrorDto(it) })
+    }
 }

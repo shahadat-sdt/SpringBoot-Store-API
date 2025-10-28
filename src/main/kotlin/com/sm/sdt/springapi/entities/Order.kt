@@ -26,7 +26,7 @@ class Order(
     @Column(name = "total_price")
     var totalPrice: BigDecimal? = null,
 
-    @OneToMany(mappedBy = "order", cascade = [(CascadeType.PERSIST)])
+    @OneToMany(mappedBy = "order", cascade = [(CascadeType.PERSIST),(CascadeType.REMOVE)])
     var items: MutableSet<OrderItem> = mutableSetOf()
 ) {
 

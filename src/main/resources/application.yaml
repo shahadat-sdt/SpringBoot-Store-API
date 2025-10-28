@@ -13,3 +13,6 @@ spring:
     secret-key: ${JWT_SECRET}
     access-token: 7200 # 5m
     refresh-token: 604800 # 7d
+stripe:
+  secretKey: ${STRIPE_SECRET_KEY}
+webAppUrl: "http://localhost:3000/"

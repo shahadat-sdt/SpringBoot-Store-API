@@ -34,6 +34,8 @@ buildscript {
     }
 }
 dependencies {
+    implementation ("com.stripe:stripe-java:27.1.0")
+
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

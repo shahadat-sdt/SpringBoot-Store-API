@@ -17,6 +17,5 @@ class CheckoutController(
     @PostMapping
     fun checkout(@RequestBody @Valid request: CheckoutRequest): CheckoutResponse {
         return checkoutService.checkout(request)
-
     }
 }
