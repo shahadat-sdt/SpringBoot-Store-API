@@ -5,4 +5,4 @@ spring:
     password: shahadat.sdt.3301
   jpa:
     show-sql: true
-webAppUrl: "http://localhost:3000/"
+webAppUrl: http://localhost:3000/
