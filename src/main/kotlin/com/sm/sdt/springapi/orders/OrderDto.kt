@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 
 data class OrderDto(
     val id: Long,
-    val paymentStatus: PaymentStatus,
+    val status: PaymentStatus,
     val createdAt: LocalDateTime,
     val items: List<OrderItemDto>,
     val totalPrice: BigDecimal

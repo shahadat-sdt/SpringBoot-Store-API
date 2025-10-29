@@ -1,9 +1,8 @@
 package com.sm.sdt.springapi.auth
 
-import com.sm.sdt.springapi.users.Role
+import com.sm.sdt.springapi.common.SecurityRules
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.AuthenticationProvider
@@ -22,16 +21,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig {
+class SecurityConfig(
+    private val userDetailsService: UserDetailsService,
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    private val featureSecurityRules: List<SecurityRules>
+) {
     @Bean
     fun passwordEncoder(): PasswordEncoder {
         return BCryptPasswordEncoder()
     }
 
     @Bean
-    fun authenticationProvider(
-        userDetailsService: UserDetailsService
-    ): AuthenticationProvider {
+    fun authenticationProvider(): AuthenticationProvider {
         val provider = DaoAuthenticationProvider()
         provider.setUserDetailsService(userDetailsService)
         provider.setPasswordEncoder(passwordEncoder())
@@ -44,19 +45,14 @@ class SecurityConfig {
     }
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity, jwtAuthenticationFilter: JwtAuthenticationFilter): SecurityFilterChain {
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http.sessionManagement { c ->
             c.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         }.csrf { c ->
             c.disable()
         }.authorizeHttpRequests { c ->
-            c.requestMatchers("/carts/**").permitAll()
-                .requestMatchers("/admin/**").hasRole(Role.ADMIN.name)
-                .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
-                .requestMatchers(HttpMethod.POST, "/checkout/webhook").permitAll()
-                .anyRequest().authenticated()
+            featureSecurityRules.forEach { it.configure(c) }
+            c.anyRequest().authenticated()
 
         }.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .exceptionHandling { c ->
