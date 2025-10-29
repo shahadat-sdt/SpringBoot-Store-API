@@ -15,4 +15,5 @@ spring:
     refresh-token: 604800 # 7d
 stripe:
   secretKey: ${STRIPE_SECRET_KEY}
+  webhook_secret_key: ${WEBHOOK_SECRET_KEY}
 webAppUrl: "http://localhost:3000/"

@@ -1,3 +1,3 @@
 package com.sm.sdt.springapi.exceptions
 
-class PaymentException : RuntimeException("Error creating a checkout session")
+class PaymentException(message: String = "Error creating a checkout session") : RuntimeException(message)

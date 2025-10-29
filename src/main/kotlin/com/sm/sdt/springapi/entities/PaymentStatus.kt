@@ -1,5 +1,5 @@
 package com.sm.sdt.springapi.entities
 
-enum class Status {
+enum class PaymentStatus {
     PENDING, PAID, FAILED, CANCELED
 }

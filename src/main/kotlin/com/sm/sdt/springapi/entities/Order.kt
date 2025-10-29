@@ -18,7 +18,7 @@ class Order(
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    var status: Status? = null,
+    var status: PaymentStatus? = null,
 
     @Column(name = "created_at", insertable = false, updatable = false)
     var createdAt: LocalDateTime? = null,
@@ -33,7 +33,7 @@ class Order(
     fun fromCart(cart: Cart, customer: User): Order {
         val order = Order()
         order.customer = customer
-        order.status = Status.PENDING
+        order.status = PaymentStatus.PENDING
         order.totalPrice = cart.calculateTotalPrice()
         cart.items.forEach { item ->
             val orderItem = OrderItem(
