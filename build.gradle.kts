@@ -14,14 +14,10 @@ group = "com.sm.sdt"
 version = "1.0.0"
 description = "Spring-API"
 
-flyway {
-    url = "jdbc:mysql://localhost:3306/spring-store-api"
-    user = "root"
-    password = "shahadat.sdt.3301"
-}
+
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 

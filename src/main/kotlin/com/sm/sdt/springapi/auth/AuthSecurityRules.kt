@@ -9,7 +9,8 @@ import org.springframework.stereotype.Component
 @Component
 class AuthSecurityRules : SecurityRules {
     override fun configure(request: AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry) {
-        request.requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+        request
+            .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
             .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
     }
 }
