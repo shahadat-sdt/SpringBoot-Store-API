@@ -1,0 +1,36 @@
+package com.sm.sdt.springapi.carts
+
+import com.sm.sdt.springapi.products.Product
+import jakarta.persistence.*
+import java.math.BigDecimal
+
+@Entity
+@Table(name = "cart_items")
+class CartItem(
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
+
+    @ManyToOne
+    @JoinColumn(name = "cart_id")
+    var cart: Cart? = null,
+
+    @ManyToOne()
+    @JoinColumn(name = "product_id")
+    var product: Product? = null,
+
+    @Column(name = "quantity")
+    var quantity: Int? = null
+) {
+
+    fun getTotalPrice(): BigDecimal {
+        return product!!.price.multiply(quantity!!.toBigDecimal())
+    }
+
+
+    override fun toString(): String {
+        return "CartItem(id=$id, quantity=$quantity)"
+    }
+
+}
