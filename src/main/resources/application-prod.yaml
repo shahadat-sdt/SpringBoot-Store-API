@@ -1,0 +1,4 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+webAppUrl: "http://localhost:3000/"
