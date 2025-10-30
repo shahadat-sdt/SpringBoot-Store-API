@@ -25,10 +25,14 @@ class StripePaymentGateway(
 
     override fun createCheckoutSession(order: Order): CheckOutSession {
         try {
-            val builder = SessionCreateParams.builder().setMode(SessionCreateParams.Mode.PAYMENT)
+            val builder = SessionCreateParams.builder()
+                .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setSuccessUrl("$webAppUrl/checkout-success?orderId=${order.id}")
                 .setCancelUrl("$webAppUrl/checkout-cancelled")
-                .putMetadata("order_id", order.id.toString())
+                .setPaymentIntentData(
+                    createPaymentIntent(order)
+                )
+
 
             order.items.forEach { item ->
                 val lineItem = createLineItem(item)
@@ -44,6 +48,11 @@ class StripePaymentGateway(
 
     }
 
+    private fun createPaymentIntent(order: Order): SessionCreateParams.PaymentIntentData? =
+        SessionCreateParams.PaymentIntentData.builder()
+            .putMetadata("order_id", order.id.toString())
+            .build()
+
     override fun parseWebhookRequest(request: WebhookRequest): Optional<PaymentResults> {
         try {
             val payload = request.payload
@@ -55,7 +64,7 @@ class StripePaymentGateway(
                     Optional.of(PaymentResults(extractOrderId(event), PaymentStatus.PAID))
                 }
 
-                "payment_intent.failed" -> {
+                "payment_intent.payment_failed" -> {
                     Optional.of(PaymentResults(extractOrderId(event), PaymentStatus.FAILED))
                 }
 
